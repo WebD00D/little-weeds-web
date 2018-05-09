@@ -37,6 +37,7 @@ class CompetitorUploads extends PureComponent {
       imageLoading: false,
 
       avatar: "",
+      imgToUse: "",
 
       caption: "",
       description: "",
@@ -44,7 +45,9 @@ class CompetitorUploads extends PureComponent {
       videoType: "",
       videoURL: "",
 
-      isUploaded: false
+      isUploaded: false,
+      uploadDisabled: false,
+      uploadText: "UPLOAD"
     };
   }
 
@@ -54,7 +57,9 @@ class CompetitorUploads extends PureComponent {
     let originalFile = files[0];
 
     this.setState({
-      imageLoading: true
+      imageLoading: true,
+      uploadDisabled: true,
+      uploadText: "LOADING..."
     });
 
     LoadImage(
@@ -78,8 +83,10 @@ class CompetitorUploads extends PureComponent {
             storageRef.put(blob).then(
               function(snapshot) {
                 this.setState({
-                  avatar: snapshot.metadata.downloadURLs[0],
-                  imageLoading: false
+                  imgToUse: snapshot.metadata.downloadURLs[0],
+                  imageLoading: false,
+                  uploadDisabled: false,
+                  uploadText: "UPLOAD"
                 });
               }.bind(this)
             );
@@ -115,7 +122,7 @@ class CompetitorUploads extends PureComponent {
 
     var updates = {};
 
-    updates["/uploads/" + uploadID + "/photo"] = this.state.avatar;
+    updates["/uploads/" + uploadID + "/photo"] = this.state.imgToUse;
     updates["/uploads/" + uploadID + "/caption"] = this.state.caption;
     updates["/uploads/" + uploadID + "/contentType"] = this.state.contentType;
     updates["/uploads/" + uploadID + "/description"] = this.state.description;
@@ -128,7 +135,7 @@ class CompetitorUploads extends PureComponent {
     updates["/uploads/" + uploadID + "/competitorId"] = this.props.userId;
 
 
-    updates[this.props.competitorType + "-uploads/" + uploadID + "/photo"] = this.state.avatar;
+    updates[this.props.competitorType + "-uploads/" + uploadID + "/photo"] = this.state.imgToUse;
     updates[this.props.competitorType + "-uploads/" + uploadID + "/caption"] = this.state.caption;
     updates[this.props.competitorType + "-uploads/" + uploadID + "/contentType"] = this.state.contentType;
     updates[this.props.competitorType + "-uploads/" + uploadID + "/description"] = this.state.description;
@@ -141,7 +148,7 @@ class CompetitorUploads extends PureComponent {
     updates[this.props.competitorType + "-uploads/" + uploadID + "/competitorId"] = this.props.userId;
 
 
-    updates["/competitors/" + this.props.userId + "/uploads/" + uploadID + "/photo"] = this.state.avatar;
+    updates["/competitors/" + this.props.userId + "/uploads/" + uploadID + "/photo"] = this.state.imgToUse;
     updates["/competitors/" + this.props.userId + "/uploads/" + uploadID + "/caption"] = this.state.caption;
     updates["/competitors/" + this.props.userId + "/uploads/" + uploadID + "/contentType"] = this.state.contentType;
     updates["/competitors/" + this.props.userId + "/uploads/" + uploadID + "/description"] = this.state.description;
@@ -152,8 +159,6 @@ class CompetitorUploads extends PureComponent {
     updates["/competitors/" + this.props.userId + "/uploads/" + uploadID + "/competitorName"] = this.props.name;
     updates["/competitors/" + this.props.userId + "/uploads/" + uploadID + "/uploadDate"] = uploadDate;
     updates["/competitors/" + this.props.userId + "/uploads/" + uploadID + "/competitorId"] = this.props.userId;
-
-
 
     fire
       .database()
@@ -364,6 +369,44 @@ class CompetitorUploads extends PureComponent {
             ) : (
               ""
             )}
+
+
+              <label className="t-sans t-upper f-13 o-5 ls-1">
+                VIDEO THUMBNAIL
+              </label>
+              <div className="fx fx-a-c fx-j-s">
+                <div>
+                  <div className="fx fx-col fx-j-c fx-a-c m-t-20 ">
+                    <Dropzone
+                      onDrop={this.uploadPhoto}
+                      className="photo-uploader photo-uploader--large"
+                      multiple={false}
+                    >
+                      <div className="t-sans">
+                        {this.state.avatar ? (
+                          <img
+                            style={{ maxWidth: "280px", width: "100%" }}
+                            src={this.state.avatar}
+                          />
+                        ) : (
+                          ""
+                        )}
+
+                        {this.state.avatar ? (
+                          ""
+                        ) : (
+                          <div className="fx fx-all fx-a-c fx-j-c t-sans f-11 ">
+                            DRAG AND DROP YOUR IMAGE <br /> OR CLICK TO SELECT A
+                            FILE
+                          </div>
+                        )}
+                      </div>
+                    </Dropzone>
+                  </div>
+                </div>
+              </div>
+
+
           </div>
         ) : (
           ""
@@ -372,9 +415,10 @@ class CompetitorUploads extends PureComponent {
         <div className="fx fx-col fx-j-c m-t-30 mx-600">
           <button
             onClick={() => this.handleRegister()}
+            disabled={this.state.uploadDisabled}
             className="button button__primary t-sans t-upper ls-1"
           >
-            UPLOAD
+            {this.state.uploadText}
           </button>
         </div>
 

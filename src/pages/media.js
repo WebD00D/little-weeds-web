@@ -26,6 +26,7 @@ class Media extends PureComponent {
     this.getUrlVars = this.getUrlVars.bind(this);
     this.saveComment = this.saveComment.bind(this);
     this.updateCommentLikes = this.updateCommentLikes.bind(this);
+    this.upVote = this.upVote.bind(this);
 
     var u = fire.auth().currentUser;
     console.log("SIGNED IN USER", u);
@@ -36,12 +37,13 @@ class Media extends PureComponent {
 
       // comment
       comment: "",
+      hasLiked: false,
 
       //data
       mediaId: "",
       contentType: "Video",
       videoType: "Vimeo",
-      videoId: "180267786",
+      videoId: "",
       photoURL: "",
       competitorType: "",
       description: "",
@@ -50,17 +52,17 @@ class Media extends PureComponent {
       competitorId: "",
       uploadDate: "",
       viewCount: 0,
-      comments: []
+      comments: [],
+      totalLikes: 0,
     };
   }
 
   componentDidMount() {
     var mediaId = this.getUrlVars()["id"];
 
-
     this.setState({
       mediaId: mediaId
-    })
+    });
 
     let competitorId = "";
     let competitorType = "";
@@ -80,13 +82,14 @@ class Media extends PureComponent {
             competitorType: snapshot.val().competitorType,
             description: snapshot.val().description,
             photoURL: snapshot.val().photo,
-            videoId: "249124889",
+            videoId: snapshot.val().videoURL,
             videoType: snapshot.val().videoType,
             competitorName: snapshot.val().competitorName,
             uploadDate: snapshot.val().uploadDate,
             viewCount: snapshot.val().viewCount,
             comments: snapshot.val().comments,
-            competitorId: snapshot.val().competitorId
+            competitorId: snapshot.val().competitorId,
+            totalLikes: snapshot.val().totalLikes || 0
           });
 
           competitorId = snapshot.val().competitorId;
@@ -115,7 +118,32 @@ class Media extends PureComponent {
         }.bind(this)
       );
 
-    // NEED TO UPDATE TOTAL VIEWS HERE..
+
+      // CHECK IF THE CURRENT USER HAS LIKE THIS VIDEO ALREADY..
+
+      fire
+        .database()
+        .ref("users/" + this.props.userId + "/likes/" + mediaId)
+        .once("value")
+        .then(function(snapshot){
+          console.log("HAS LIKED SNAP", snapshot.val());
+
+
+          if ( snapshot.val() ) {
+            this.setState({
+              hasLiked: true
+            })
+          } else {
+            this.setState({
+              hasLiked: false
+            })
+          }
+
+
+
+        }.bind(this))
+
+
   }
 
   getUrlVars() {
@@ -134,42 +162,168 @@ class Media extends PureComponent {
       return;
     }
 
-    var dateId = Date.now()
+    var dateId = Date.now();
 
     var updates = {};
 
-
     const today = new Date();
-    const commentDate = today.getMonth() + 1 + "-" + today.getDate() + "-" + today.getFullYear();
+    const commentDate =
+      today.getMonth() + 1 + "-" + today.getDate() + "-" + today.getFullYear();
 
-    updates["/uploads/" + this.state.mediaId + "/comments/" + dateId + "/comment"] = this.state.comment;
-    updates["/uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterId"] = this.props.userId;
-    updates["/uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterUsername"] = this.props.username;
-    updates["/uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterName"] = this.props.name;
-    updates["/uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterEmail"] = this.props.email;
-    updates["/uploads/" + this.state.mediaId + "/comments/" + dateId + "/commentTime"] = commentDate;
-    updates["/uploads/" + this.state.mediaId + "/comments/" + dateId + "/likes"] = 0;
+    updates[
+      "/uploads/" + this.state.mediaId + "/comments/" + dateId + "/comment"
+    ] = this.state.comment;
+    updates[
+      "/uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterId"
+    ] = this.props.userId;
+    updates[
+      "/uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/commenterUsername"
+    ] = this.props.username;
+    updates[
+      "/uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/commenterName"
+    ] = this.props.name;
+    updates[
+      "/uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/commenterEmail"
+    ] = this.props.email;
+    updates[
+      "/uploads/" + this.state.mediaId + "/comments/" + dateId + "/commentTime"
+    ] = commentDate;
+    updates[
+      "/uploads/" + this.state.mediaId + "/comments/" + dateId + "/likes"
+    ] = 0;
 
+    updates[
+      this.state.competitorType +
+        "-uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/comment"
+    ] = this.state.comment;
+    updates[
+      this.state.competitorType +
+        "-uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/commenterId"
+    ] = this.props.userId;
+    updates[
+      this.state.competitorType +
+        "-uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/commenterUsername"
+    ] = this.props.username;
+    updates[
+      this.state.competitorType +
+        "-uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/commenterName"
+    ] = this.props.name;
+    updates[
+      this.state.competitorType +
+        "-uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/commenterEmail"
+    ] = this.props.email;
+    updates[
+      this.state.competitorType +
+        "-uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/commenterTime"
+    ] = commentDate;
+    updates[
+      this.state.competitorType +
+        "-uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/likes"
+    ] = 0;
 
-
-    updates[this.state.competitorType + "-uploads/" + this.state.mediaId + "/comments/" + dateId + "/comment"] = this.state.comment;
-    updates[this.state.competitorType + "-uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterId"] = this.props.userId;
-    updates[this.state.competitorType + "-uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterUsername"] = this.props.username;
-    updates[this.state.competitorType + "-uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterName"] = this.props.name;
-    updates[this.state.competitorType + "-uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterEmail"] = this.props.email;
-    updates[this.state.competitorType + "-uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterTime"] = commentDate;
-    updates[this.state.competitorType + "-uploads/" + this.state.mediaId + "/comments/" + dateId + "/likes"] = 0;
-
-
-    updates["/competitors/" + this.state.competitorId + "/uploads/" + this.state.mediaId + "/comments/" + dateId + "/comment"] = this.state.comment;
-    updates["/competitors/" + this.state.competitorId + "/uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterId"] = this.props.userId;
-    updates["/competitors/" + this.state.competitorId + "/uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterUsername"] = this.props.username;
-    updates["/competitors/" + this.state.competitorId + "/uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterName"] = this.props.name;
-    updates["/competitors/" + this.state.competitorId + "/uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterEmail"] = this.props.email;
-    updates["/competitors/" + this.state.competitorId + "/uploads/" + this.state.mediaId + "/comments/" + dateId + "/commenterTime"] = commentDate;
-    updates["/competitors/" + this.state.competitorId + "/uploads/" + this.state.mediaId + "/comments/" + dateId + "/likes"] = 0;
-
-
+    updates[
+      "/competitors/" +
+        this.state.competitorId +
+        "/uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/comment"
+    ] = this.state.comment;
+    updates[
+      "/competitors/" +
+        this.state.competitorId +
+        "/uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/commenterId"
+    ] = this.props.userId;
+    updates[
+      "/competitors/" +
+        this.state.competitorId +
+        "/uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/commenterUsername"
+    ] = this.props.username;
+    updates[
+      "/competitors/" +
+        this.state.competitorId +
+        "/uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/commenterName"
+    ] = this.props.name;
+    updates[
+      "/competitors/" +
+        this.state.competitorId +
+        "/uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/commenterEmail"
+    ] = this.props.email;
+    updates[
+      "/competitors/" +
+        this.state.competitorId +
+        "/uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/commenterTime"
+    ] = commentDate;
+    updates[
+      "/competitors/" +
+        this.state.competitorId +
+        "/uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        dateId +
+        "/likes"
+    ] = 0;
 
     fire
       .database()
@@ -197,60 +351,102 @@ class Media extends PureComponent {
             viewCount: snapshot.val().viewCount,
             comments: snapshot.val().comments,
             competitorId: snapshot.val().competitorId,
-            showCommentBox: false
+            showCommentBox: false,
+            totalLikes: snapshot.val().totalLikes || 0
 
           });
-
-
-        }.bind(this))
-
-
+        }.bind(this)
+      );
   }
 
   updateCommentLikes(commentId, likes) {
-
     const newLikes = parseInt(likes) + 1;
 
     var updates = {};
 
-    updates["/uploads/" + this.state.mediaId + "/comments/" + commentId + "/likes"] = newLikes;
-    updates[this.state.competitorType + "-uploads/" + this.state.mediaId + "/comments/" + commentId + "/likes"] = newLikes;
-    updates["/competitors/" + this.state.competitorId + "/uploads/" + this.state.mediaId + "/comments/" + commentId + "/likes"] = newLikes;
+    updates[
+      "/uploads/" + this.state.mediaId + "/comments/" + commentId + "/likes"
+    ] = newLikes;
+    updates[
+      this.state.competitorType +
+        "-uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        commentId +
+        "/likes"
+    ] = newLikes;
+    updates[
+      "/competitors/" +
+        this.state.competitorId +
+        "/uploads/" +
+        this.state.mediaId +
+        "/comments/" +
+        commentId +
+        "/likes"
+    ] = newLikes;
 
     fire
       .database()
       .ref()
       .update(updates);
 
+    fire
+      .database()
+      .ref("uploads/" + this.state.mediaId)
+      .once("value")
+      .then(
+        function(snapshot) {
+          console.log("MEDIA SNAPSHOT AFTER COMMENT", snapshot.val());
+
+          this.setState({
+            contentType: snapshot.val().contentType,
+            caption: snapshot.val().caption,
+            competitorType: snapshot.val().competitorType,
+            description: snapshot.val().description,
+            photoURL: snapshot.val().photo,
+            videoId: "249124889",
+            videoType: snapshot.val().videoType,
+            competitorName: snapshot.val().competitorName,
+            uploadDate: snapshot.val().uploadDate,
+            viewCount: snapshot.val().viewCount,
+            comments: snapshot.val().comments,
+            competitorId: snapshot.val().competitorId,
+            showCommentBox: false,
+            totalLikes: snapshot.val().totalLikes || 0
+
+          });
+        }.bind(this)
+      );
+  }
+
+  upVote() {
+
+    const newTotalCount = parseInt(this.state.totalLikes) + 1;
+
+
+    fire
+      .database()
+      .ref()
+
+      var updates = {};
+
+      updates[
+        "users/" + this.props.userId + "/likes/" + this.state.mediaId + "/totalLikes"
+      ] = true;
+      updates["/competitors/" + this.props.userId + "/uploads/" + this.state.mediaId + "/totalLikes"] = newTotalCount
+      updates[this.state.competitorType + "-uploads/" + this.state.mediaId + "/totalLikes"] = newTotalCount
+      updates["/uploads/" + this.state.mediaId + "/totalLikes"] = newTotalCount
 
       fire
         .database()
-        .ref("uploads/" + this.state.mediaId)
-        .once("value")
-        .then(
-          function(snapshot) {
-            console.log("MEDIA SNAPSHOT AFTER COMMENT", snapshot.val());
-
-            this.setState({
-              contentType: snapshot.val().contentType,
-              caption: snapshot.val().caption,
-              competitorType: snapshot.val().competitorType,
-              description: snapshot.val().description,
-              photoURL: snapshot.val().photo,
-              videoId: "249124889",
-              videoType: snapshot.val().videoType,
-              competitorName: snapshot.val().competitorName,
-              uploadDate: snapshot.val().uploadDate,
-              viewCount: snapshot.val().viewCount,
-              comments: snapshot.val().comments,
-              competitorId: snapshot.val().competitorId,
-              showCommentBox: false
-
-            });
+        .ref()
+        .update(updates);
 
 
-          }.bind(this))
-
+        this.setState({
+          hasLiked: true,
+          totalLikes: newTotalCount
+        })
 
 
   }
@@ -262,36 +458,42 @@ class Media extends PureComponent {
       return <Redirect to="/registration" />;
     }
 
+    let comments =
+      this.state.comments &&
+      Object.keys(this.state.comments).map(
+        function(key) {
+          var d = new Date(key);
 
+          console.log("UPLOAD DATE", d.toLocaleString());
 
-    let comments = this.state.comments && Object.keys(this.state.comments).map(function(key){
-
-
-      var d = new Date(key);
-
-
-      console.log("UPLOAD DATE", d.toLocaleString())
-
-      return (
-        <div key={key} className="fx fx-col m-t-30 mx-992">
-          <div className="t-sans f-13 ls-1  bb-solid-lgrey p-b-20 p-t-20 fx fx-a-s">
-            <div className=" lh-18 fx fx-col">
-              <div>
-                {" "}
-                {this.state.comments[key].comment}
+          return (
+            <div key={key} className="fx fx-col m-t-30 mx-992">
+              <div className="t-sans f-13 ls-1  bb-solid-lgrey p-b-20 p-t-20 fx fx-a-s">
+                <div className=" lh-18 fx fx-col">
+                  <div> {this.state.comments[key].comment}</div>
+                  <label className="t-sans f-11 m-t-4 ls-1  o-5">
+                    {" "}
+                    {this.state.comments[key].commenterUsername} @{" "}
+                    {this.state.comments[key].commentTime}
+                  </label>
+                  <label
+                    onClick={() =>
+                      this.updateCommentLikes(
+                        key,
+                        this.state.comments[key].likes
+                      )
+                    }
+                    className="t-sans f-11 m-t-4 ls-1 hover o-5"
+                  >
+                    <i className="fa fa-thumbs-up" />{" "}
+                    {this.state.comments[key].likes}
+                  </label>
+                </div>
               </div>
-              <label className="t-sans f-11 m-t-4 ls-1  o-5"> {this.state.comments[key].commenterUsername} @ {this.state.comments[key].commentTime}</label>
-              <label onClick={ () => this.updateCommentLikes(key, this.state.comments[key].likes) } className="t-sans f-11 m-t-4 ls-1 hover o-5">
-                <i className="fa fa-thumbs-up" /> {this.state.comments[key].likes}
-              </label>
             </div>
-          </div>
-        </div>
-      )
-
-    }.bind(this))
-
-
+          );
+        }.bind(this)
+      );
 
     return (
       <div className="m-b-100">
@@ -329,7 +531,7 @@ class Media extends PureComponent {
           ""
         )}
 
-        <div className=" mx-992">
+        <div className=" mx-992 m-t-100">
           {this.state.contentType === "Video" &&
           this.state.videoType === "Vimeo" ? (
             <div className="embed-container">
@@ -339,6 +541,24 @@ class Media extends PureComponent {
                 }?title=0&byline=0&portrait=0`}
               />
             </div>
+          ) : (
+            ""
+          )}
+
+          {this.state.contentType === "Video" &&
+          this.state.videoType === "YouTube" ? (
+            <div className="embed-container">
+            <iframe  src={`https://www.youtube.com/embed/${this.state.videoId}`} frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+          ) : (
+            ""
+          )}
+
+          {this.state.contentType === "Photo" ? (
+            <img
+              style={{ height: "auto", width: "100%" }}
+              src={this.state.photoURL}
+            />
           ) : (
             ""
           )}
@@ -355,7 +575,10 @@ class Media extends PureComponent {
               </label>
             </div>
             <div>
-              <label className="t-sans t-upper f-13 o-5 ls-1">...</label>
+              <label className="t-sans t-upper f-13 o-5 ls-1"> {
+                !this.state.hasLiked ?
+                  <div onClick={ ()=> this.upVote() }><i className="fa fa-thumbs-o-up"></i> {this.state.totalLikes}</div>
+                : <div> <i className="fa fa-thumbs-up"></i> {this.state.totalLikes}</div> } </label>
             </div>
           </div>
         </div>
@@ -392,12 +615,7 @@ class Media extends PureComponent {
           </button>
         </div>
 
-
         {comments}
-
-
-
-
       </div>
     );
   }
