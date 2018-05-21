@@ -1,142 +1,283 @@
 import React, { PureComponent } from "react";
-import { Route, Redirect } from "react-router-dom";
-
 import Link from "gatsby-link";
-
-import "../layouts/css/fcss.css";
-import "../layouts/css/page.css";
-
-import Nav from "../components/Nav";
-import FormInput from "../components/FormInput";
-import RadioInput from "../components/RadioInput";
-import Switch from "../components/Switch";
-
 import fire from "../fire";
+import { Route, Redirect } from "react-router-dom";
+import MapGL, { Marker, Popup, NavigationControl } from "react-map-gl";
+import cx from "classnames";
+import _ from "lodash";
+
 import { connect } from "react-redux";
 
-import Dropzone from "react-dropzone";
-import LoadImage from "blueimp-load-image";
+import "../layouts/css/fcss.css";
+
+import CITIES from "../data/cities.json";
 
 class Surf extends PureComponent {
   constructor(props) {
     super(props);
 
-    var u = fire.auth().currentUser;
-    console.log("SIGNED IN USER", u);
-
-    this.state = {
-      email_error: false,
-      password_error: false,
-
-      uploads: []
-    };
+    this.state = {};
   }
 
-  componentDidMount() {
-    // GATHER ALL SURF ENTRIES..
-
-    fire
-      .database()
-      .ref("Surf-uploads/")
-      .once("value")
-      .then(
-        function(snapshot) {
-          console.log("SURF MEDIA UPLOADS..", snapshot.val());
-          this.setState({
-            uploads: snapshot.val()
-          });
-        }.bind(this)
-      );
+  componentWillMount() {
+    // check if user is signed in ..
+    // end check if user is signed in..
   }
+
+  getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(";");
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) == " ") {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+
+  componentDidMount() {}
 
   render() {
-    console.log("THIS STATE", this.state);
-
-    let uploads =
-      this.state.uploads &&
-      Object.keys(this.state.uploads).map(function(key) {
-        console.log("SURF UPLOAD KEY", key);
-
-        let bg = this.state.uploads[key].photo;
-
-        let totalLikes = 0;
-
-        if ( this.state.uploads[key].totalLikes ) {
-          totalLikes = this.state.uploads[key].totalLikes;
-        }
-
-
-        return (
-          <a href={`/media?id=${key}`} key={key} className="upload-list-item t-sans td-none fc-black">
-            <div
-              className="upload-list-item__bg"
-              style={{
-                backgroundImage: `url(${bg})`
-              }}
-            />
-            <div className="p-l-14 upload-list-item__meta">
-                <div className="f-16 m-b-10">{this.state.uploads[key].caption}</div>
-                <div className="f-13 m-b-10">{this.state.uploads[key].description.substring(0,100)}...</div>
-                <div className="f-11 o-5 m-b-10">{ this.state.uploads[key].competitorName } on {this.state.uploads[key].uploadDate}</div>
-                <div className="f-11 o-5 fx">
-                    <div className="meta-piece">
-                      <i className="fa fa-eye p-r-4"></i>
-                      {this.state.uploads[key].viewCount}
-                    </div>
-                    <div className="meta-piece">
-                        <i className="fa fa-comment p-r-4"></i>
-                        {_.size(this.state.uploads[key].comments)}
-                    </div>
-                    <div className="meta-piece">
-                      <i className="fa fa-thumbs-up p-r-4"></i> {totalLikes}
-                    </div>
-
-
-
-                </div>
-            </div>
-          </a>
-        )
-      }.bind(this));
-
-    if (!this.props.authenticated) {
-      return <Redirect to="/registration" />;
-    }
-
     return (
-      <div className="m-b-100">
-        <div className="page-banner fx fx-j-c fx-a-c m-b-100">
-          <div className="t-sans t-upper f-28 ls-2 ">SURF</div>
+      <div className="mx-1200" id="container">
+        <div className="hero-banner " style={{backgroundImage: `url(${require("../images/DR2.jpg")})`}}>
+            <div className="f-38 t-sans fc-white absolute z-3 ls-2 fw-700">SURFING</div>
         </div>
-
-        <div className="upload-list-container">
-
-
-
-          {_.reverse(uploads)}
+        <div className="page-containers">
+          <div className="page--primary">
 
 
+            <div className="main-feed">
+
+            <div className="page--secondary__header">Latest </div>
+
+              <div className="feed-item">
+                <div className="feed-item__img"></div>
+                <div className="fx fx-col p-l-14">
+                  <div className="t-sans fc-red fw-700 f-11 t-upper m-b-4 ls-2">SURF </div>
+                  <div className="t-sans f-22 fw-700 m-b-12">Lorem Ipsum Dolar Set Amit</div>
+                  <div className="t-sans f-13 lh-22 m-b-12">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard..
+                  </div>
+                  <div className="t-sans o-5 t-upper f-11"><b>Sam Mcintosh</b> &mdash; 22 min ago</div>
+                </div>
+              </div>
+
+              <div className="feed-item">
+                <div className="feed-item__img"></div>
+                <div className="fx fx-col p-l-14">
+                  <div className="t-sans fc-red fw-700 f-11 t-upper m-b-4 ls-2">SURF </div>
+                  <div className="t-sans f-22 fw-700 m-b-12">Lorem Ipsum Dolar Set Amit</div>
+                  <div className="t-sans f-13 lh-22 m-b-12">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard..
+                  </div>
+                  <div className="t-sans o-5 t-upper f-11"><b>Sam Mcintosh</b> &mdash; 22 min ago</div>
+                </div>
+              </div>
+
+              <div className="feed-item">
+                <div className="feed-item__img"></div>
+                <div className="fx fx-col p-l-14">
+                  <div className="t-sans fc-red fw-700 f-11 t-upper m-b-4 ls-2">SURF </div>
+                  <div className="t-sans f-22 fw-700 m-b-12">Lorem Ipsum Dolar Set Amit</div>
+                  <div className="t-sans f-13 lh-22 m-b-12">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard..
+                  </div>
+                  <div className="t-sans o-5 t-upper f-11"><b>Sam Mcintosh</b> &mdash; 22 min ago</div>
+                </div>
+              </div>
+
+              <div className="feed-item">
+                <div className="feed-item__img"></div>
+                <div className="fx fx-col p-l-14">
+                  <div className="t-sans fc-red fw-700 f-11 t-upper m-b-4 ls-2">SURF </div>
+                  <div className="t-sans f-22 fw-700 m-b-12">Lorem Ipsum Dolar Set Amit</div>
+                  <div className="t-sans f-13 lh-22 m-b-12">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard..
+                  </div>
+                  <div className="t-sans o-5 t-upper f-11"><b>Sam Mcintosh</b> &mdash; 22 min ago</div>
+                </div>
+              </div>
+
+            </div> {/* END MAIN FEED */}
+
+          </div>
+          <div className="page--secondary">
+            <div className="page--secondary__header">Mentor's Top 10</div>
+
+            <div className="ranked-item">
+                <div className="ranked-item__number">1</div>
+                <div className="ranked-item__title">
+                  Lorem Ipsum Dolar Set Amit Consectetur Ipiseum
+                </div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">2</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">3</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">4</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">5</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">6</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">7</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">8</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">9</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">10</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+
+            <div className="side-ad t-sans">Advertisement</div>
 
 
+            <div className="page--secondary__header">Featured Surf Competitors</div>
+
+            <div className="ranked-item fx-s-b">
+                <div className="ranked-item__title fx-col">
+                  <div className="m-b-4"><b>Christian Bryant</b></div>
+                  <div className="f-13">Lorem ipsum dolar set amit consectetur ipeset foretune eet em eset.</div>
+                </div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item fx-s-b">
+                <div className="ranked-item__title fx-col">
+                  <div className="m-b-4"><b>Christian Bryant</b></div>
+                  <div className="f-13">Lorem ipsum dolar set amit consectetur ipeset foretune eet em eset.</div>
+                </div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item fx-s-b">
+                <div className="ranked-item__title fx-col">
+                  <div className="m-b-4"><b>Christian Bryant</b></div>
+                  <div className="f-13">Lorem ipsum dolar set amit consectetur ipeset foretune eet em eset.</div>
+                </div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item fx-s-b">
+                <div className="ranked-item__title fx-col">
+                  <div className="m-b-4"><b>Christian Bryant</b></div>
+                  <div className="f-13">Lorem ipsum dolar set amit consectetur ipeset foretune eet em eset.</div>
+                </div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item fx-s-b">
+                <div className="ranked-item__title fx-col">
+                  <div className="m-b-4"><b>Christian Bryant</b></div>
+                  <div className="f-13">Lorem ipsum dolar set amit consectetur ipeset foretune eet em eset.</div>
+                </div>
+                <div className="ranked-item__photo"></div>
+            </div>
+
+          </div>
         </div>
       </div>
     );
   }
 }
 
-const mapStateToProps = ({ userId, email, username, name, authenticated }) => {
-  return { userId, email, username, name, authenticated };
+const mapStateToProps = ({
+  userId,
+  latitude,
+  longitude,
+  regions,
+  mapZoom,
+  citesByRegion,
+  boardsByCity,
+  allBoardsList,
+  boardsToDisplay,
+  account_username,
+  selectedCity,
+  regionHasNoBoards,
+  selectedRegion,
+  isSeller,
+  userAuthenticated,
+  accessGranted
+}) => {
+  return {
+    userId,
+    latitude,
+    longitude,
+    regions,
+    mapZoom,
+    citesByRegion,
+    boardsByCity,
+    allBoardsList,
+    boardsToDisplay,
+    account_username,
+    selectedCity,
+    regionHasNoBoards,
+    selectedRegion,
+    isSeller,
+    userAuthenticated,
+    accessGranted
+  };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    setCurrentUser: (userId, username, name, email) =>
+    setMapPosition: (latitude, longitude) =>
+      dispatch({ type: `SET_MAP_POSITION`, latitude, longitude }),
+    setCityData: city => dispatch({ type: `SET_CITY_DATA`, city }),
+    setRegionData: region =>
+      dispatch({ type: `SET_REGION_AND_CITIES`, region }),
+    getAllBoards: boards => dispatch({ type: `GET_ALL_BOARDS`, boards }),
+    getAllBoardsByRegion: boards =>
+      dispatch({ type: `GET_ALL_BOARDS_BY_REGION`, boards }),
+    getAllBoardsByCity: boards =>
+      dispatch({ type: `GET_ALL_BOARDS_BY_CITY`, boards }),
+    allowAccess: () => dispatch({ type: `ALLOW_ACCESS` }),
+    setCurrentUser: (
+      userId,
+      username,
+      email,
+      hasNotifications,
+      paypal_email,
+      seller
+    ) =>
       dispatch({
         type: `SET_CURRENT_USER`,
         userId,
         username,
-        name,
-        email
+        email,
+        hasNotifications,
+        paypal_email,
+        seller
       })
   };
 };

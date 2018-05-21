@@ -29,16 +29,16 @@ module.exports = props => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         {props.headComponents}
         {css}
-        <link
-          href="https://fonts.googleapis.com/css?family=Work+Sans:400,500,700"
-          rel="stylesheet"
-        />
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet" />
+
         <script src="https://use.fontawesome.com/9aa665cf7f.js" />
-        
 
 
       </head>
       <body className="sans-serif black">
+
+
+
         <div className="site-wrapper">
           <div
             id="___gatsby"

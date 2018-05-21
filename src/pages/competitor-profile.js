@@ -92,8 +92,8 @@ class CompetitorProfile extends PureComponent {
         function(key, idx) {
           if (idx <= 2) {
             return (
-              <a className="hover hover-opacity" href={`/media?id=${key}`} ><div
-                key={key}
+              <a key={key} className="hover hover-opacity" href={`/media?id=${key}`} ><div
+
                 style={{
                   backgroundImage: `url(${this.state.uploads[key].photo})`
                 }}
@@ -109,7 +109,7 @@ class CompetitorProfile extends PureComponent {
       Object.keys(this.state.uploads).map(
         function(key, idx) {
           return (
-            <a href={`/media?id=${key}`} className="td-none fc-black hover hover-opacity"><div className="competitor-upload-list-item" key={key}>
+            <a key={key} href={`/media?id=${key}`} className="td-none fc-black hover hover-opacity"><div className="competitor-upload-list-item" >
               <div
                 className="competitor-upload-list-item__photo"
                 style={{
@@ -164,6 +164,7 @@ class CompetitorProfile extends PureComponent {
     );
   }
 }
+
 
 const mapStateToProps = ({ userId, email, username, name, authenticated }) => {
   return { userId, email, username, name, authenticated };

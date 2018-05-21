@@ -43,11 +43,12 @@ class TemplateWrapper extends React.Component {
             { name: "keywords", content: "sample, something" }
           ]}
         />
-        {/* <Navbar /> */ }
+         <Nav /> 
         <div className="nav-container">
-        <Nav />
+
+
         {this.props.children()}
-      </div>
+        </div>
       </div>
     );
   }

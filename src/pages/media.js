@@ -531,6 +531,30 @@ class Media extends PureComponent {
           ""
         )}
 
+
+        <div className="fx fx-col fx-j-c fx-a-c m-t-100 mx-600">
+            <div className="fx fx-col fx-a-c fx-j-c">
+            <label className="t-sans f-16 fc-red ls-1 fw-500 t-center t-upper m-b-12">
+              {this.state.competitorType}
+            </label>
+              <label className="t-sans f-38 lh-48 ls-1 fw-500 t-center">
+                {this.state.caption}
+              </label>
+            </div>
+        </div>
+
+        <div className="profile-media-block">
+          <div className="profile-photo--sm" />
+          <div className="fx fx-col">
+            <label className="t-sans f-13 ls-1 ">
+              {this.state.competitorName}
+            </label>
+            <label className="t-sans f-11 m-t-4 ls-1  o-5">
+              {this.state.uploadDate}
+            </label>
+          </div>
+        </div>
+
         <div className=" mx-992 m-t-100">
           {this.state.contentType === "Video" &&
           this.state.videoType === "Vimeo" ? (
@@ -567,9 +591,6 @@ class Media extends PureComponent {
         <div className="fx fx-col fx-j-s fx-a-s m-t-30 mx-992">
           <div className="media-title__bar">
             <div className="fx fx-col">
-              <label className="t-sans f-28 ls-1 fw-500">
-                {this.state.caption}
-              </label>
               <label className="t-sans t-upper f-13 o-5 ls-1 m-t-8">
                 {this.state.viewCount} Views
               </label>
@@ -584,17 +605,7 @@ class Media extends PureComponent {
         </div>
 
         <div className="fx fx-col fx-j-s fx-a-s mx-992 m-t-20 bb-solid-lgrey">
-          <div className="profile-media-block">
-            <div className="profile-photo--sm" />
-            <div className="fx fx-col">
-              <label className="t-sans f-13 ls-1 p-l-14">
-                {this.state.competitorName}
-              </label>
-              <label className="t-sans f-11 m-t-4 ls-1 p-l-14 o-5">
-                {this.state.uploadDate}
-              </label>
-            </div>
-          </div>
+
 
           <div className="t-sans f-13 ls-1 m-t-8 p-l-64  p-b-20 lh-18 ">
             {this.state.description}

@@ -12,7 +12,7 @@ import "../layouts/css/fcss.css";
 
 import CITIES from "../data/cities.json";
 
-class IndexPage extends PureComponent {
+class Film extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -45,36 +45,16 @@ class IndexPage extends PureComponent {
   render() {
     return (
       <div className="mx-1200" id="container">
-        <div className="hero-banner" style={{backgroundImage: `url(${require("../images/DR2.jpg")})`}}></div>
+        <div className="hero-banner " style={{backgroundImage: `url(${require("../images/DR2.jpg")})`}}>
+            <div className="f-38 t-sans fc-white absolute z-3 ls-2 fw-700">FILM</div>
+        </div>
         <div className="page-containers">
           <div className="page--primary">
 
-            <div className="featured-post">
-                <div className="t-sans fc-red fw-700 f-13 t-upper ls-2">SURF </div>
-                <div className="t-sans fw-700 f-38 m-b-20">Dane Reynold's Announced as the New Little Weeds Surf Mentor</div>
-                <div className="t-sans f-13 lh-22 m-b-12">
-                  Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book
-                </div>
-                <div className="t-sans f-13 lh-22 fc-grey">
-                 3 hours ago
-                </div>
-            </div>
-
-            <div className="featured-post">
-                <div className="hero-banner" style={{backgroundImage: `url(${require("../images/DaneReynoldsCover.jpg")})`}}></div>
-                <div className="t-sans fc-red fw-700 f-13 t-upper ls-2">STAB FAVORITE </div>
-                <div className="t-sans fw-700 f-38 m-b-20">Lorem Ipsum Dolar Set Amit</div>
-                <div className="t-sans f-13 lh-22 m-b-12">
-                  Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book
-                </div>
-                <div className="t-sans f-13 lh-22 fc-grey">
-                 3 hours ago
-                </div>
-            </div>
 
             <div className="main-feed">
 
-            <div className="page--secondary__header">Latest Uploads</div>
+            <div className="page--secondary__header">Latest </div>
 
               <div className="feed-item">
                 <div className="feed-item__img"></div>
@@ -128,7 +108,7 @@ class IndexPage extends PureComponent {
 
           </div>
           <div className="page--secondary">
-            <div className="page--secondary__header">Top Voted</div>
+            <div className="page--secondary__header">Mentor's Top 10</div>
 
             <div className="ranked-item">
                 <div className="ranked-item__number">1</div>
@@ -154,6 +134,31 @@ class IndexPage extends PureComponent {
             </div>
             <div className="ranked-item">
                 <div className="ranked-item__number">5</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">6</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">7</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">8</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">9</div>
+                <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
+                <div className="ranked-item__photo"></div>
+            </div>
+            <div className="ranked-item">
+                <div className="ranked-item__number">10</div>
                 <div className="ranked-item__title">Lorem Ipsum Dolar Set Amit Consectetur Ipiseum</div>
                 <div className="ranked-item__photo"></div>
             </div>
@@ -282,4 +287,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(IndexPage);
+export default connect(mapStateToProps, mapDispatchToProps)(Film);
